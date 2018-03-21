@@ -18,6 +18,7 @@
       background-image: url('http://fillmurray.com/100/100');
       border: 1px solid black;
       position: absolute;
+      margin: 5px;
     }
 
     .specialBox {
@@ -38,6 +39,13 @@
 </head>
 
 <body>
+  <h2>Find the different Murray</h2>
+  <p>High Scores: <span id="highScoreHTML"></span></p>
+  <p>Timer: <span id="timer">0</span></p>
+  <button type="button" id="easy">Easy</button>
+  <button type="button" id="medium">Medium</button>
+  <button type="button" id="hard">Hard</button>
+
   <div id="container"></div>
 
   <div id="winGame" class="modal">
@@ -49,9 +57,35 @@
     <h2>You suck</h2>
     <button type="button" class="tryAgain">Try Again</button>
   </div>
+
+  <audio autoplay loop>
+    <source src="Jeopardy-theme-song.mp3" type="audio/mp3">
+  </audio>
   <script type="text/javascript">
+    // number of boxes
+    var n;
+    // special box index
+    var specialBoxIndex;
+
+    //Time variables
+    var nIntervId;
+    var timeCount = 1;
+
+    // Create local storage for highscores
+    var highScoreHTML = document.getElementById('highScoreHTML');
+    highScoreHTML.innerHTML = localStorage.highScores;
+
     //Get the container element and assign it to a variable
     var container = document.getElementById('container');
+
+    //Start game buttons Easy Medium and Hard
+    // Get objects and set event listeners
+    var easy = document.getElementById('easy');
+    easy.addEventListener('click', startEasy);
+    var medium = document.getElementById('medium');
+    medium.addEventListener('click', startMedium);
+    var hard = document.getElementById('hard');
+    hard.addEventListener('click', startHard);
 
     //Get modal dom elements
     var modals = document.getElementsByClassName('modal');
@@ -66,20 +100,34 @@
       tryAgainButton[i].addEventListener('click', reloadPage);
     }
 
-    // Create variable for n using prompt input
-    var n = prompt('Enter a number');
-    // Parse input into an integer
-    n = parseInt(n);
+
+
+    function startEasy() {
+      n = 100;
+      specialBoxIndex = getSpecialBoxIndex(n);
+      placeRandomBoxes(n);
+      setTime();
+    }
+
+    function startMedium() {
+      n = 250;
+      specialBoxIndex = getSpecialBoxIndex(n);
+      placeRandomBoxes(n);
+      setTime();
+    }
+
+    function startHard() {
+      n = 500;
+      specialBoxIndex = getSpecialBoxIndex(n);
+      placeRandomBoxes(n);
+      setTime();
+    }
 
     //Generate random number function
     function getSpecialBoxIndex(num) {
       var ranNum = Math.floor(Math.random() * num - 1);
-      console.log(ranNum);
       return ranNum;
     }
-
-    //Generate and assign random number to specialBoxIndex
-    var specialBoxIndex = getSpecialBoxIndex(n);
 
     // Place random boxes function
     function placeRandomBoxes(num) {
@@ -94,13 +142,12 @@
       }
       container.innerHTML = divHTML;
       var box = document.getElementsByClassName('box');
-      console.log(box.length);
 
       for (var i = 0; i < box.length; i++) {
-        var x = Math.floor(Math.random() * 500);
-        x += 'px';
-        var y = Math.floor(Math.random() * 500);
-        y += 'px';
+        var x = Math.floor(Math.random() * 80) - 1;
+        x += '%';
+        var y = Math.floor(Math.random() * 80) - 1;
+        y += '%';
 
         box[i].style.top = x;
         box[i].style.left = y;
@@ -112,18 +159,19 @@
         }
       }
     }
-    // Call random box function
-    placeRandomBoxes(n);
 
+    // Win game function
     function winGame() {
+      clearInterval(nIntervId);
       winGameModal.style.display = 'block';
       removeEventListeners();
-
+      setHighScore();
     }
 
+    // Lose game function
     function loseGame() {
+      clearInterval(nIntervId);
       loseGameModal.style.display = 'block';
-
       removeEventListeners();
     }
 
@@ -136,12 +184,30 @@
       }
     }
 
-    //Reload page functions
+    //Reload page function
     function reloadPage() {
       for (var i = 0; i < modals.length; i++) {
         modals[i].style.display = 'none';
       }
       location.reload();
+    }
+
+    function setTime() {
+      nIntervId = setInterval(updateTime, 1000);
+    }
+
+    function updateTime() {
+      var time = document.getElementById('timer');
+      time.innerHTML = timeCount;
+      timeCount++;
+    }
+
+    function setHighScore() {
+      var prevHighScore = parseInt(localStorage.highScores);
+      if (prevHighScore > timeCount) {
+        localStorage.highScores = timeCount;
+      }
+      highScoreHTML.innerHTML = localStorage.highScores;
     }
   </script>
 </body>
