@@ -73,7 +73,7 @@
 
     // Create local storage for highscores
     var highScoreHTML = document.getElementById('highScoreHTML');
-    highScoreHTML.innerHTML = localStorage.highScores;
+    initializeHighScore();
 
     //Get the container element and assign it to a variable
     var container = document.getElementById('container');
@@ -153,9 +153,9 @@
         box[i].style.left = y;
 
         if (i == specialBoxIndex) {
-          box[i].addEventListener('mouseover', winGame);
+          box[i].addEventListener('click', winGame);
         } else {
-          box[i].addEventListener('mouseover', loseGame);
+          box[i].addEventListener('click', loseGame);
         }
       }
     }
@@ -178,9 +178,9 @@
     //Remove the event listeners on game end
     function removeEventListeners() {
       var box = document.getElementsByClassName('box');
-      box[specialBoxIndex].removeEventListener('mouseover', winGame);
+      box[specialBoxIndex].removeEventListener('click', winGame);
       for (var i = 0; i < box.length; i++) {
-        box[i].removeEventListener('mouseover', loseGame);
+        box[i].removeEventListener('click', loseGame);
       }
     }
 
@@ -203,11 +203,21 @@
     }
 
     function setHighScore() {
+
       var prevHighScore = parseInt(localStorage.highScores);
-      if (prevHighScore > timeCount) {
+      if (prevHighScore > timeCount || prevHighScore == 0) {
         localStorage.highScores = timeCount;
       }
-      highScoreHTML.innerHTML = localStorage.highScores;
+      highScoreHTML.innerHTML = localStorage.highScores - 1;
+    }
+
+    function initializeHighScore() {
+      if (!localStorage.highScores) {
+        localStorage.setItem('highScores', '0')
+        highScoreHTML.innerHTML = '0';
+      } else {
+        highScoreHTML.innerHTML = localStorage.highScores - 1;
+      }
     }
   </script>
 </body>
